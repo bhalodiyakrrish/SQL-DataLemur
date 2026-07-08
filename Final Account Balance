@@ -1,14 +1,9 @@
 SELECT
   account_id,
-  Deposit - Withdrawal AS final_balance
-FROM (
-SELECT 
-  account_id,
-  SUM(CASE 
-    WHEN transaction_type = 'Deposit' THEN amount
-  END) AS Deposit,
-  SUM(CASE 
-    WHEN transaction_type = 'Withdrawal' THEN amount
-  END) AS Withdrawal
+  SUM(
+    CASE 
+      WHEN transaction_type = 'Deposit' THEN amount
+      ELSE -amount END
+  ) AS final_balance
 FROM transactions
-GROUP BY account_id) AS t1;
+GROUP BY account_id;
