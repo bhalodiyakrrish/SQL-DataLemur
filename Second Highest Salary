@@ -1,0 +1,11 @@
+WITH emp_salary_ranking AS (
+  SELECT 
+    employee_id,
+    name,
+    salary,
+    ROW_NUMBER() OVER(ORDER BY salary DESC) AS salary_rank
+  FROM employee)
+  SELECT
+    salary AS second_highest_salary
+  FROM emp_salary_ranking
+  WHERE salary_rank = 2;
