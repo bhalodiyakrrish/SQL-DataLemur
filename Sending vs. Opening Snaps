@@ -1,0 +1,16 @@
+WITH user_time_spent AS (
+  SELECT 
+    user_id,
+    activity_type,
+    SUM(time_spent) AS act_time
+  FROM activities
+  WHERE activity_type IN ('send','open')
+  GROUP BY user_id,activity_type)
+SELECT
+  ab.age_bucket,
+  ROUND(SUM(act_time) FILTER(WHERE activity_type = 'send') * 100/ SUM(act_time),2) AS send_perc,
+  ROUND(SUM(act_time) FILTER(WHERE activity_type = 'open') * 100/ SUM(act_time),2) AS open_perc
+FROM user_time_spent ut
+LEFT JOIN age_breakdown ab 
+ON ut.user_id = ab.user_id
+GROUP BY ab.age_bucket;
