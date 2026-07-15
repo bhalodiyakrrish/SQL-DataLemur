@@ -1,0 +1,19 @@
+WITH measurement_time_rank_cte AS (
+  SELECT 
+    measurement_id,
+    measurement_value,
+    measurement_time::DATE AS measurement_day,
+    ROW_NUMBER() OVER(PARTITION BY measurement_time::DATE ORDER BY measurement_time) AS time_rank 
+  FROM measurements
+)
+SELECT
+  measurement_day,
+  SUM(CASE 
+        WHEN time_rank % 2 != 0 THEN measurement_value
+      END) AS odd_sum,
+  SUM(CASE 
+        WHEN time_rank % 2 = 0 THEN measurement_value
+      END) AS even_sum
+FROM measurement_time_rank_cte
+GROUP BY measurement_day
+ORDER BY measurement_day;
