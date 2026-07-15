@@ -1,0 +1,9 @@
+SELECT
+  cust_ct.customer_id
+FROM customer_contracts AS cust_ct
+JOIN products AS prod 
+ON cust_ct.product_id = prod.product_id
+GROUP BY cust_ct.customer_id
+HAVING COUNT(DISTINCT prod.product_category) = (SELECT
+                                                  COUNT(DISTINCT product_category)
+                                                FROM products);
