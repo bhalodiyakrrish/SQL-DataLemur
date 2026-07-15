@@ -1,0 +1,17 @@
+WITH dept_highest_earners_cte AS (
+  SELECT 
+    dept.department_name,
+    emp.name,
+    emp.salary,
+    DENSE_RANK() OVER(PARTITION BY dept.department_name ORDER BY emp.salary DESC) AS salary_rank
+  FROM employee AS emp 
+  INNER JOIN department dept
+  ON emp.department_id = dept.department_id
+)
+SELECT
+  department_name,
+  name,
+  salary
+FROM dept_highest_earners_cte
+WHERE salary_rank <= 3
+ORDER BY department_name ASC, salary DESC, name ASC;
