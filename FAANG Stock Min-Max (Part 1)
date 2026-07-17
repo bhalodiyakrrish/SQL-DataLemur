@@ -1,0 +1,25 @@
+WITH open_high_cte AS (
+  SELECT 
+    ticker,
+    date,
+    open,
+    ROW_NUMBER() OVER(PARTITION BY ticker ORDER BY open DESC) AS open_rank
+  FROM stock_prices
+), open_low_cte AS (
+  SELECT 
+    ticker,
+    date,
+    open,
+    ROW_NUMBER() OVER(PARTITION BY ticker ORDER BY open ASC) AS open_rank
+  FROM stock_prices
+)
+SELECT
+  oh.ticker,
+  TO_CHAR(oh.date,'Mon-YYYY') AS highest_mth,
+  oh.open AS highest_open,
+  TO_CHAR(ol.date,'Mon-YYYY') AS lowest_mth,
+  ol.open AS lowest_open
+FROM open_high_cte AS oh  
+INNER JOIN open_low_cte AS ol 
+ON oh.ticker = ol.ticker
+WHERE oh.open_rank = 1 AND ol.open_rank = 1;
