@@ -1,0 +1,10 @@
+SELECT 
+  ROUND(COUNT(*) * 100.0 / (SELECT
+                              COUNT(*)
+                            FROM phone_calls),1) AS international_calls_pct
+FROM phone_calls
+LEFT JOIN phone_info AS phone_caller
+ON phone_calls.caller_id = phone_caller.caller_id
+LEFT JOIN phone_info AS phone_receiver
+ON phone_receiver.caller_id = phone_calls.receiver_id
+WHERE phone_caller.country_id <> phone_receiver.country_id; 
