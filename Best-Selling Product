@@ -1,0 +1,17 @@
+WITH best_cat_prod_cte AS (
+  SELECT 
+    category_name,
+    product_name,
+    SUM(sales_quantity) AS total_quantity,
+    ROUND(AVG(rating),2) AS prod_review,
+    ROW_NUMBER() OVER(PARTITION BY category_name ORDER BY SUM(sales_quantity) DESC, AVG(rating) DESC) AS prod_rank
+  FROM products AS prod 
+  LEFT JOIN product_sales AS prod_sales
+  ON prod.product_id = prod_sales.product_id
+  GROUP BY category_name, product_name
+)
+SELECT
+  category_name,
+  product_name
+FROM best_cat_prod_cte
+WHERE prod_rank = 1;
