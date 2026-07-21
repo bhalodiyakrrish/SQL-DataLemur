@@ -1,0 +1,13 @@
+WITH yoy_spend_cte AS (
+  SELECT 
+    EXTRACT(YEAR FROM transaction_date) AS year,
+    product_id,
+    SUM(spend) as curr_year_spend,
+    LAG(SUM(spend)) OVER(PARTITION BY product_id ORDER BY EXTRACT(YEAR FROM transaction_date)) AS prev_year_spend
+  FROM user_transactions
+  GROUP BY EXTRACT(YEAR FROM transaction_date), product_id
+)
+SELECT
+  *,
+  ROUND((curr_year_spend - prev_year_spend)*100.0/prev_year_spend,2) AS yoy_rate
+FROM yoy_spend_cte;
