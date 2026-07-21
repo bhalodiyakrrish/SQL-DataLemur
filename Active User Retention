@@ -1,0 +1,15 @@
+WITH user_details_cte AS (
+  SELECT 
+    user_id,
+    EXTRACT(MONTH FROM event_date) AS mth,
+    COUNT(event_id) AS current_total_events,
+    LAG(COUNT(event_id),1,0) OVER(PARTITION BY user_id ORDER BY EXTRACT(MONTH FROM event_date)) AS last_total_events
+  FROM user_actions
+  GROUP BY user_id, EXTRACT(MONTH FROM event_date)
+)
+SELECT
+  mth,
+  COUNT(*) AS monthly_acive_users
+FROM user_details_cte
+WHERE mth = 7 AND current_total_events > 0 AND last_total_events > 0
+GROUP BY mth;
